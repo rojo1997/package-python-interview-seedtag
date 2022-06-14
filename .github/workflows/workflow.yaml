@@ -107,18 +107,3 @@ jobs:
             PIPSERVER_URL=${{secrets.PIPSERVER_URL}}
             PIPSERVER_USERNAME=${{secrets.PIPSERVER_USERNAME}}
             PIPSERVER_PASSWORD=${{secrets.PIPSERVER_PASSWORD}}
-  deploy-in-do-kubernetes:
-    runs-on: ubuntu-latest
-    needs: [build-and-push-docker-image]
-    if: "${{contains(github.event.head_commit.message, 'cd run') && contains(github.event.head_commit.message, 'DO')}}"
-    steps:
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl set image deployment/${{ env.KUBERNETES_DEPLOYMENT }} ${{ env.KUBERNETES_DEPLOYMENT }}=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} -n ${{ env.KUBERNETES_NAMESPACE }}
-      - name: Verify deployment
-        run: kubectl rollout status deployment/${{ env.KUBERNETES_DEPLOYMENT }} -n ${{ env.KUBERNETES_NAMESPACE }}
