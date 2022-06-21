@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "interview-seedtag"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Ernesto Martínez del Pino <ernestomar1997@hotmail.com>"]
 packages = [
+    { include = "interview_seedtag" },
     { include = "model" },
     { include = "tests" }
 ]
